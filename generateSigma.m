@@ -1,6 +1,14 @@
-function [sigma] = generateSigma()
+function [sigma] = generateSigma(type,nv)
 
-%random sigma values initial method step1
-sigma = [1 1.5; 1.5 3];
+sigma = [];
 
-%sigma = [1 1; 1 1];
+if strcmp(type,'fake1')
+    sigma = ones(nv);
+end
+
+if strcmp(type,'fake2')
+    rng(1)
+    ii = rand(nv);
+    sigma = ii*ii.';
+end
+

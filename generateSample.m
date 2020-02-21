@@ -1,4 +1,4 @@
-function [samples,fakeView]=generateSample(representative_tensor,N,nv,NumFeatures,numROIs)
+function [samples,fakeView]=generateSample(view,representative_tensor,N,nv,NumFeatures,numROIs,sigmaType)
 
 % vectorize representative tensors
 tensors = representative_tensor;
@@ -17,17 +17,33 @@ end
 
 % generating samples
 % resource: https://www.mathworks.com/help/stats/mvnrnd.html
+for i=1:nv
+   V1{i}=vectorize(view{i}); 
+end
+
+%Concatenated vectorized views
+for i=1:N
+    subjects{i}=V1{1}(i,:);
+    for j=2:nv
+       subjects{i}=[subjects{i};V1{j}(i,:)]; %V{i}:4*595: number of views*number of features
+    end
+end
+
 for k=1:size(features,2)
     mu = features{k};
     
-%     % finding covariance of the original features
-%     originalfeatures =zeros(N,nv);
-%     for i=1:N
-%         originalfeatures(i,:) = subj1{i}(:,k);
-%     end
-%     sigma = cov(originalfeatures);
-%     % end of "finding covariance of the original features"
-    sigma = generateSigma();
+    % finding covariance of the original features
+    originalfeatures =zeros(N,nv);
+    for i=1:N
+        originalfeatures(i,:) = subjects{i}(:,k);
+    end
+    
+    
+    if strcmp(sigmaType,'cov')
+        sigma = cov(originalfeatures);
+    else
+        sigma = generateSigma(sigmaType,nv);
+    end
     R{k} = mvnrnd(mu,sigma,N);
 end
 
