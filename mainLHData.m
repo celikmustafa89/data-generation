@@ -93,11 +93,11 @@ LH_all_CBTs{5} = LH_fake_netNorm_CBT3;
 LH_all_self_frob_dists{5} = LH_fake_Frob_dist3;
 
 
-LH_names{1} = 'LHtrain';
-LH_names{2} = 'LHeval';
-LH_names{3} = 'LHfake1(sigma=1)';
-LH_names{4} = 'LHfake2(sigma=rand)';
-LH_names{5} = 'LHfake3(sigma=trainData)';
+LH_names{1} = 'LH-train';
+LH_names{2} = 'LH-eval';
+LH_names{3} = 'LH-fake1(sigma=1)';
+LH_names{4} = 'LH-fake2(sigma=rand)';
+LH_names{5} = 'LH-fake3(sigma=trainData)';
 
 tiledlayout(2,2) % Requires R2019b or later
 
@@ -125,33 +125,169 @@ title('Frobenious Distance Between CBTs and Train Dataset');
 set(gca, 'XTickLabel',LH_names);
 
 
-nexttile
-LH_evaluation_vs_others = [];
-for i=1:size(LH_all_CBTs,2)
-    LH_evaluation_vs_others = [LH_evaluation_vs_others frobenious(LH_eval_view,LH_all_CBTs{i},LH_eval_nv)];
-end
-%frobenious distance between CBTs and evaluation samples
-bar(LH_evaluation_vs_others)
-ylim([0 40]);
-xlabel('Dataset Name');
-ylabel('Distance between Evaluation Samples-CBTs');
-title('Frobenious Distance Between CBTs and Evaluation Dataset');
-set(gca, 'XTickLabel',LH_names);
+% nexttile
+% LH_evaluation_vs_others = [];
+% for i=1:size(LH_all_CBTs,2)
+%     LH_evaluation_vs_others = [LH_evaluation_vs_others frobenious(LH_eval_view,LH_all_CBTs{i},LH_eval_nv)];
+% end
+% %frobenious distance between CBTs and evaluation samples
+% bar(LH_evaluation_vs_others)
+% ylim([0 40]);
+% xlabel('Dataset Name');
+% ylabel('Distance between Evaluation Samples-CBTs');
+% title('Frobenious Distance Between CBTs and Evaluation Dataset');
+% set(gca, 'XTickLabel',LH_names);
 
 
-nexttile
+% nexttile
 LH_cross_dists = [];
 for i=1:size(LH_all_views,2)
     LH_cross_dists = [LH_cross_dists cross_distance(LH_eval_view,LH_eval_N,LH_all_views{i},LH_eval_N,LH_eval_nv)];
 end
-%cross distance between new samples and evaluation samples
-bar(LH_cross_dists)
-ylim([0 40]);
-xlabel('Dataset Name');
-ylabel('Distance between Evaluation and Fake Samples');
-title('Cross Distance Between Fake and Evaluation Dataset');
-set(gca, 'XTickLabel',LH_names);
+% %cross distance between new samples and evaluation samples
+% bar(LH_cross_dists)
+% ylim([0 40]);
+% xlabel('Dataset Name');
+% ylabel('Distance between Evaluation and Fake Samples');
+% title('Cross Distance Between Fake and Evaluation Dataset');
+% set(gca, 'XTickLabel',LH_names);
 
 annotation('textbox', [0.945, 0.9, 0.1, 0.1], 'String', "# view = "+4,'FitBoxToText','on')
 annotation('textbox', [0.945, 0.86, 0.1, 0.1], 'String', "# ROI = "+35,'FitBoxToText','on')
 annotation('textbox', [0.945, 0.82, 0.1, 0.1], 'String', "# subject = "+36,'FitBoxToText','on')
+
+
+%% Genetic Algorithm for finding optimum sigma value for generater
+numIteration = 10;
+[best_sigmas1, sigma_distances1, newViews1] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'half','version1','gen1');
+[best_sigmas2, sigma_distances2, newViews2] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'mix','version1','gen1');
+
+[best_sigmas3, sigma_distances3, newViews3] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'half','version2','gen1');
+[best_sigmas4, sigma_distances4, newViews4] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'mix','version2','gen1');
+
+for i=6:numIteration+5
+    LH_names{i} = "itr-"+(i-5); 
+end
+
+
+%% bar plot start
+LH_cross_dists2 = LH_cross_dists;
+LH_cross_dists3 = LH_cross_dists;
+LH_cross_dists4 = LH_cross_dists;
+
+LH_cross_dists = [LH_cross_dists sigma_distances1];
+LH_cross_dists2 = [LH_cross_dists2 sigma_distances2];
+LH_cross_dists3 = [LH_cross_dists3 sigma_distances3];
+LH_cross_dists4 = [LH_cross_dists4 sigma_distances4];
+
+tot=[];
+for i=1:length(LH_cross_dists)
+    line = [LH_cross_dists(i) LH_cross_dists2(i) LH_cross_dists3(i) LH_cross_dists4(i)];
+    tot = [tot; line];
+end
+
+b = bar(tot)
+ylim([0 40]);
+xlim([0 length(LH_names)+1]);
+xlabel('Dataset Name');
+ylabel('Distance between Evaluation and Fake Samples');
+title('Cross Distance Between Fake and Evaluation Dataset');
+% set legends
+bar_names = {'psd-v1,half','psd-v1,mix','psd-v2,half','psd-v2,mix',};
+set(b, {'DisplayName'}, bar_names') 
+legend() 
+set(gca, 'XTick', 1:length(LH_names),'XTickLabel',LH_names);
+xtickangle(45)
+
+% first bar naming
+xtips1 = b(1).XEndPoints;
+ytips1 = b(1).YEndPoints;
+labels1 = string(b(1).YData);
+text(xtips1,ytips1,labels1,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+% second bar naming
+xtips2 = b(2).XEndPoints;
+ytips2 = b(2).YEndPoints;
+labels2 = string(b(2).YData);
+text(xtips2,ytips2,labels2,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+% third bar naming
+xtips3 = b(3).XEndPoints;
+ytips3 = b(3).YEndPoints;
+labels3 = string(b(3).YData);
+text(xtips3,ytips3,labels3,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+% fourth bar naming
+xtips4 = b(4).XEndPoints;
+ytips4 = b(4).YEndPoints;
+labels4 = string(b(4).YData);
+text(xtips4,ytips4,labels4,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+%% bar plot end
+
+
+%% self frob distances
+self_dists = [];
+for i=1:5
+    self_dists = [self_dists LH_all_self_frob_dists{i}];
+end
+
+%netNorm generates the fake representative tensors and CBTs
+tot2=[];
+for i=1:5
+    line = [self_dists(i) self_dists(i) self_dists(i) self_dists(i) ];
+    tot2 = [tot2; line];
+end
+for i=6:numIteration+5
+    [LH_fake_NumFeatures6,self_dist1,LH_fake_representative_tensor6,LH_fake_netNorm_CBT6] = netNorm_func(newViews1{i-5},LH_train_nv,LH_train_N,LH_train_numROIs);
+    [LH_fake_NumFeatures6,self_dist2,LH_fake_representative_tensor6,LH_fake_netNorm_CBT6] = netNorm_func(newViews2{i-5},LH_train_nv,LH_train_N,LH_train_numROIs);
+    [LH_fake_NumFeatures6,self_dist3,LH_fake_representative_tensor6,LH_fake_netNorm_CBT6] = netNorm_func(newViews3{i-5},LH_train_nv,LH_train_N,LH_train_numROIs);
+    [LH_fake_NumFeatures6,self_dist4,LH_fake_representative_tensor6,LH_fake_netNorm_CBT6] = netNorm_func(newViews4{i-5},LH_train_nv,LH_train_N,LH_train_numROIs);
+
+    line = [self_dist1 self_dist2 self_dist3 self_dist4];
+    tot2 = [tot2; line];
+end
+
+b2 = bar(tot2)
+ylim([0 40]);
+xlim([0 length(LH_names)+1]);
+xlabel('Dataset Name');
+ylabel('Self Frobenious Distance');
+title('Frobenious Distance Between CBT and samples');
+% set legends
+bar_names = {'psd-v1,half','psd-v1,mix','psd-v2,half','psd-v2,mix',};
+set(b2, {'DisplayName'}, bar_names') 
+legend() 
+set(gca, 'XTick', 1:length(LH_names),'XTickLabel',LH_names);
+xtickangle(45)
+
+% first bar naming
+xtips1 = b2(1).XEndPoints;
+ytips1 = b2(1).YEndPoints;
+labels1 = string(b2(1).YData);
+text(xtips1,ytips1,labels1,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+% second bar naming
+xtips2 = b2(2).XEndPoints;
+ytips2 = b2(2).YEndPoints;
+labels2 = string(b2(2).YData);
+text(xtips2,ytips2,labels2,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+% third bar naming
+xtips3 = b2(3).XEndPoints;
+ytips3 = b2(3).YEndPoints;
+labels3 = string(b2(3).YData);
+text(xtips3,ytips3,labels3,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+% fourth bar naming
+xtips4 = b2(4).XEndPoints;
+ytips4 = b2(4).YEndPoints;
+labels4 = string(b2(4).YData);
+text(xtips4,ytips4,labels4,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',90)
+%% self frob distances end
+
+%% sigma value for each feature method-2
+
+%% sigma value for each feature method-2 end
+
