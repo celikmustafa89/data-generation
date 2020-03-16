@@ -21,4 +21,4 @@ Bu adımda sigma degerini optimize etmek için genetik algoritma kullanıldı. R
 
 ![Step-4 Iteration Graph](https://github.com/celikmustafa89/data-generation/tree/develop/figures/iteration-graph1.png)
 
-![General Comparison Graph](https://github.com/celikmustafa89/data-generation/tree/develop/figures/method-graph1.png)
+![General Comparison Graph](https://user-images.githubusercontent.com/6848680/76770008-4eaaac80-67ae-11ea-974e-5473e34fc441.png)
