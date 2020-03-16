@@ -24,7 +24,13 @@ for k=1:numPopulation
     sigmas{k} = feature_sigmas;
 end
 %%%
-fprintf(' %i random sigma values are generated.\n', numPopulation)
+fprintf(' %i random sigma values are generated for each feature.\n', numPopulation)
+%%
+% 
+%   for x = 1:10
+%       disp(x)
+%   end
+% 
 
 m=1; % best sigma counter
 for itr=1:numIteration

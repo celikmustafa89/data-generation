@@ -160,31 +160,41 @@ annotation('textbox', [0.945, 0.82, 0.1, 0.1], 'String', "# subject = "+36,'FitB
 %% Genetic Algorithm for finding optimum sigma value for generater
 numIteration = 10;
 [best_sigmas1, sigma_distances1, newViews1] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'half','version1','gen1');
-[best_sigmas2, sigma_distances2, newViews2] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'mix','version1','gen1');
-
-[best_sigmas3, sigma_distances3, newViews3] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'half','version2','gen1');
-[best_sigmas4, sigma_distances4, newViews4] = geneticAlgorithm(LH_eval_view,numIteration,LH_train_N,LH_train_nv,LH_train_numROIs,LH_train_representative_tensor,LH_train_NumFeatures,'mix','version2','gen1');
 
 for i=6:numIteration+5
     LH_names{i} = "itr-"+(i-5); 
 end
 
-
-%% bar plot start
-LH_cross_dists2 = LH_cross_dists;
-LH_cross_dists3 = LH_cross_dists;
-LH_cross_dists4 = LH_cross_dists;
-
 LH_cross_dists = [LH_cross_dists sigma_distances1];
-LH_cross_dists2 = [LH_cross_dists2 sigma_distances2];
-LH_cross_dists3 = [LH_cross_dists3 sigma_distances3];
-LH_cross_dists4 = [LH_cross_dists4 sigma_distances4];
+LH_names{1} = 'train set';
+LH_names{2} = 'evaluation set';
+LH_names{3} = 'fake-1(sigma=1)';
+LH_names{4} = 'fake-2(random sigma)';
+LH_names{5} = 'fake3(sigma from train set)';
+LH_names{6} = 'fake-4(genetic algorithm)';
+b = bar(LH_cross_dists)
+ylim([0 40]);
+xlim([0 length(LH_names)+1]);
+xlabel('Sample Space');
+ylabel('Cross-Distance between Evaluation Samples');
+title('Cross-Distance Between Evaluation-Samples');
+set(gca, 'XTick', 1:length(LH_names),'XTickLabel',LH_names);
+xtickangle(45)
+% first bar naming
+xtips1 = b(1).XEndPoints;
+ytips1 = b(1).YEndPoints;
+labels1 = string(b(1).YData);
+text(xtips1,ytips1,labels1,'VerticalAlignment','bottom',...
+    'VerticalAlignment','bottom','rotation',0)
+% tot=[];
+% for i=1:length(LH_cross_dists)
+%     line = [LH_cross_dists(i) LH_cross_dists2(i) LH_cross_dists3(i) LH_cross_dists4(i)];
+%     tot = [tot; line];
+% end
 
-tot=[];
-for i=1:length(LH_cross_dists)
-    line = [LH_cross_dists(i) LH_cross_dists2(i) LH_cross_dists3(i) LH_cross_dists4(i)];
-    tot = [tot; line];
-end
+
+
+
 
 b = bar(tot)
 ylim([0 40]);

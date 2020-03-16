@@ -24,7 +24,10 @@ end
 fprintf(' %i random sigma values are generated.\n', numPopulation)
 
 m=1; % best sigma counter
-for itr=1:numIteration
+itr=0;
+%for itr=1:numIteration
+while 1
+    itr=itr+1;
     fprintf('iteration: %i\n', itr)
     sigma_distance = zeros(length(sigmas));
     newViews = {};
@@ -108,6 +111,29 @@ for itr=1:numIteration
     end
     sigmas = new_sigmas;
     
+    % 7. plot the graph
+    
+    b = bar(best_sigma_dists)
+    ylim([0 40]);
+    xlim([0 m+1]);
+    xlabel('Dataset Name');
+    ylabel('Distance between Evaluation and Fake Samples');
+    title('Cross Distance Between Fake and Evaluation Dataset');
+    set(gca, 'XTick', 1:m,'XTickLabel',[1:1:m]);
+    xtickangle(45)
+   
+    xtips1 = b(1).XEndPoints;
+    ytips1 = b(1).YEndPoints;
+    labels1 = string(b(1).YData);
+    text(xtips1,ytips1,labels1,'VerticalAlignment','bottom',...
+        'VerticalAlignment','bottom','rotation',75)
+    if rem(itr,20) == 1
+        prompt = '111 for stop, 0 for continue?? ';
+        stop = input(prompt)
+        if stop == 111
+            break;
+        end
+    end
 end
 
 
