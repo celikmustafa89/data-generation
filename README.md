@@ -18,4 +18,8 @@ Sonrasında farklı bir yöntem denenerek sigma degeri train set içerisndeki de
 ## Step 4 
 Bu adımda sigma degerini optimize etmek için genetik algoritma kullanıldı. Rastgele 60 tane sigma degeri oluşturulup, bu degerler ile ayrı ayrı sentetik veri kümeleri oluşturuldu. Herbir veri kümesinin evaluation kümesi ile cross-distance hesabı yapıldı. Bu hesap sonucunda en güzel sonucu veren belli miktardaki sigma degerleri seçildi. Seçilen bu degerler genetik algoritma ile crossover ve mutasyon işlemlerine sokuldu. Bu işlem sonucunda elde edilen children sigma degerleri ile tekrardan sentetik veri setleri üretildi ve evaluation set ile cross-distance hesapları yapıldı. Bu hesaplamalar sonucunda yeni üretilen children sigmalar ve eski sigmalar karşılaştırılarak en başarılı olanlar seçildi ve crossover mutasyon işlemleri belli bir  başarı elde edilene kadar tekrarlandı. Bu işlem sonucunda sigma degerlerinin 3. adımdaki başarıya eriştigini çok küçük bir fark ile geçtiği gözlemlendi.
 
+![Step-4 Iteration Graph](https://user-images.githubusercontent.com/6848680/76770235-a34e2780-67ae-11ea-8426-0d8fe6e12776.png)
+
+
+![General Comparison Graph](https://user-images.githubusercontent.com/6848680/76770008-4eaaac80-67ae-11ea-974e-5473e34fc441.png)
 
