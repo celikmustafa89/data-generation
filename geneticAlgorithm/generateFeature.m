@@ -1,4 +1,4 @@
-function [samples,fakeView] = generateSampleGA(representative_tensor,N,nv,NumFeatures,numROIs, sigma)
+function [samples,fakeView] = generateFeature(representative_tensor,N,nv,NumFeatures,numROIs, sigma)
 
 % vectorize representative tensors
 tensors = representative_tensor;
@@ -8,27 +8,22 @@ for k=1:nv
 end
 
 % extract related features from different view to vector
-% tic
-% features = {NumFeatures};
-% for f=1:NumFeatures
-%     values = [];
-%     for v=1:nv
-%         values = [values view_vec{v}(f)];
-%     end
-%     features{f} = values; 
-% end
-% disp('featuers')
-% toc
+features = {NumFeatures};
+for f=1:NumFeatures
+    values = [];
+    for v=1:nv
+        values = [values view_vec{v}(f)];
+    end
+    features{f} = values; 
+end
 
 % generating samples
 % resource: https://www.mathworks.com/help/stats/mvnrnd.html
-for k=1:NumFeatures
-    mu = [];
-    for v=1:nv
-        mu = [mu view_vec{v}(k)];
-    end
+
+for k=1:size(features,2)
+    mu = features{k};
     rng(1); % this line is for generating same sample for same values.
-    R{k} = mvnrnd(mu,sigma,N);
+    R{k} = mvnrnd(mu,sigma{k},N);
 end
 
 % extract samples from features

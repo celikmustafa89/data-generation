@@ -1,19 +1,6 @@
 function [best_sigmas, best_sigma_dists, best_views] = geneticAlgorithmEachFeature(eval_view,numIteration,N,nv,numROIs,representative_tensor,NumFeatures,crossover_type,spd_type,generation_type)
 
-
-%0. initialization of the variables
-%N = LH_train_N;
-%nv = LH_train_nv;
-%numROIs = LH_train_numROIs;
-%eval_view = LH_eval_view;
-%representative_tensor = LH_train_representative_tensor;
-%NumFeatures = LH_eval_Numfeatures;
-
-%1. generate sigma value as population
-% burada random olarak 60 tane sigma value olusturuluyor.
-% sonrasında bu sigma value ile genetik algoritması calıstırılacak
 numPopulation = 60;
-
 for k=1:numPopulation
     feature_sigmas = {NumFeatures}; 
     for i=1:NumFeatures
@@ -23,17 +10,13 @@ for k=1:numPopulation
     end
     sigmas{k} = feature_sigmas;
 end
-%%%
-fprintf(' %i random sigma values are generated for each feature.\n', numPopulation)
-%%
-% 
-%   for x = 1:10
-%       disp(x)
-%   end
-% 
 
-m=1; % best sigma counter
-for itr=1:numIteration
+fprintf(' %i random sigma values are generated for each feature.\n', numPopulation)
+
+
+itr=0; % best sigma counter
+while 1
+    itr = itr + 1;
     fprintf('iteration: %i\n', itr)
     
         sigma_distance = zeros(length(sigmas));
@@ -45,7 +28,7 @@ for itr=1:numIteration
             % burada sigma value'lar kullanılarak sample'lar üretiliyor ve
             % sonrasında cross-distance hesabı yapılarak her bir sigmanın cross
             % distance degeri bulunuyor.
-            [sigma_distance(i) newViews{i}] = fitness_function(eval_view,representative_tensor,N,nv,NumFeatures,numROIs,sigmas{i},generation_type);
+            [sigma_distance(i) newViews{i}] = fitness_functionV2(eval_view,representative_tensor,N,nv,NumFeatures,numROIs,sigmas{i},generation_type);
         end
 
         % 4. sort sigma value by looking fitnesses

@@ -59,26 +59,26 @@ T = 20; %Number of Iterations, usually (10~20)
 
 
 
-fprintf('views are being vectorized...\n');
+%fprintf('views are being vectorized...\n');
 for i=1:nv
    V{i}=vectorize(view{i}); 
 end
-fprintf('views are vectorized.\n\n');
+%fprintf('views are vectorized.\n\n');
 
 %Concatenated vectorized views
-fprintf('vectorized views are concatenationg...\n');
+%fprintf('vectorized views are concatenationg...\n');
 for i=1:N
     subj{i}=V{1}(i,:);
     for j=2:nv
        subj{i}=[subj{i};V{j}(i,:)]; %V{i}:4*595: number of views*number of features
     end
 end
-fprintf('concatenation of vectorized views are done.\n\n');
+%fprintf('concatenation of vectorized views are done.\n\n');
 
 [~,NumFeatures]=size(subj{1});
 
 %construct hyper graphs
-fprintf('hyper graphs are constructing...\n');
+%fprintf('hyper graphs are constructing...\n');
 for k=1:NumFeatures
    
     for i=1:N
@@ -90,10 +90,10 @@ for k=1:NumFeatures
     end
     score_matrix{k}=score_matrix{k}-diag(diag(score_matrix{k}));
 end
-fprintf('hyper graph construction is done.\n\n');
+%fprintf('hyper graph construction is done.\n\n');
 
 %Sum of rows H{k} to calculate the score for each feature vector
-fprintf('Score_vect is generating...\n');
+%fprintf('Score_vect is generating...\n');
 Score_vect=zeros(N,NumFeatures);
 for k=1:NumFeatures   
     for j=1:N
@@ -106,7 +106,7 @@ for k=1:NumFeatures
     Score=Score_vect(:,k);
     min_Sc(k,1)=min(Score);
 end
-fprintf('Score_vect is generated.\n\n');
+%fprintf('Score_vect is generated.\n\n');
 
 for k=1:NumFeatures
     for i=1:N
@@ -115,27 +115,27 @@ for k=1:NumFeatures
     [Index{k}]=find(L,1);
 end
 
-fprintf('representative_views are generating...\n');
+%fprintf('representative_views are generating...\n');
 for k=1:nv
     for i=1:NumFeatures
         representative_view{k}(i,1)=V{k}(Index{i},i);
     end
 end
-fprintf('representative_views are generated.\n\n');
+%fprintf('representative_views are generated.\n\n');
 
 %reconstruction of representative views
-fprintf('representative views are reconstructing...\n');
+%fprintf('representative views are reconstructing...\n');
 for k=1:nv
     VIEW{k}=anti_vectorize((representative_view{k})',m);
     VIEW{k}=VIEW{k}+(VIEW{k})'-diag(diag(VIEW{k}));%matrix symetry
 end
-fprintf('representative_views reconstruction is done.\n\n');
+%fprintf('representative_views reconstruction is done.\n\n');
 
 %SNF application
-fprintf('CBTs are generating by using SNF...\n');
+%fprintf('CBTs are generating by using SNF...\n');
 [netNorm_CBT]=SNF(VIEW,K,T,alpha);
 netNorm_CBT=netNorm_CBT-diag(diag(netNorm_CBT)); %Estimated brain connectional template
-fprintf('CBTs generation is done.\n\n');
+%fprintf('CBTs generation is done.\n\n');
 
 L1=min(min(netNorm_CBT(netNorm_CBT>0)));
 %
@@ -147,7 +147,7 @@ L1=min(min(netNorm_CBT(netNorm_CBT>0)));
 L2=max(max(netNorm_CBT));
 
 
-fprintf('Frobenious distance is calculating...\n');
+%fprintf('Frobenious distance is calculating...\n');
 Frob_dist=0;
 for k=1:nv
     Frob_dist=Frob_dist+FrobMetric(view{k},netNorm_CBT);
@@ -157,8 +157,8 @@ Frob_dist=Frob_dist/nv;
 fprintf('The mean Frobenius distance is:')
 Frob_dist
 Round_Distance = sprintf('%.3f',Frob_dist)
-fprintf('Frobenious distance calculation is done.\n\n');
+%fprintf('Frobenious distance calculation is done.\n\n');
 
-imagesc(netNorm_CBT,[L1 L2])
-title('The estimated CBT')
-colorbar
+%%imagesc(netNorm_CBT,[L1 L2])
+%%title('The estimated CBT')
+%%colorbar

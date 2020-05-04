@@ -1,4 +1,4 @@
-function [best_sigmas, best_sigma_dists, best_views] = geneticAlgorithm(eval_view,numIteration,N,nv,numROIs,representative_tensor,NumFeatures,crossover_type,spd_type,generation_type)
+function [best_sigmas, best_sigma_dists, best_view] = geneticAlgorithm(eval_view,N,nv,numROIs,representative_tensor,NumFeatures,crossover_type,spd_type,generation_type)
 
 
 %0. initialization of the variables
@@ -40,25 +40,27 @@ while 1
         % distance degeri bulunuyor.
         [sigma_distance(i) newViews{i}] = fitness_function(eval_view,representative_tensor,N,nv,NumFeatures,numROIs,sigmas{i},generation_type);
     end
+    
 
     % 4. sort sigma value by looking fitnesses
     % [out,idx] = sort([14 8 91 19])
     % burada sigmalara karsılık bulunan cross-distance degerleri
     % sıralanıyor.
     [~,sorted_ids] = sort(sigma_distance);
-    
+
     % burası 1 iterationda bir en iyi sonucu alıyor
-    if rem(itr,1) == 0
+    %if rem(itr,1) == 0
         best_sigma_dists(m) = sigma_distance(sorted_ids(1));
-        best_views{m} = newViews{sorted_ids(1)};
+        best_view = newViews{sorted_ids(1)};
         fprintf('sigma distance: %i\n', best_sigma_dists(m));
         m=m+1;
-    end
-    
+    %end
+
     % 5. select   sigma values as parents
     % sıralanan degerler arasında en basarılı sigma degerleri seçilecek
     % 5.1 decide number of parent for crossover
     % burada kaç tane parent secilmesi gerektiği bulunuyor.
+
     for i=1:numPopulation
         if i*(i+1) > numPopulation
             numMatingParents = i;
@@ -127,12 +129,9 @@ while 1
     labels1 = string(b(1).YData);
     text(xtips1,ytips1,labels1,'VerticalAlignment','bottom',...
         'VerticalAlignment','bottom','rotation',75)
-    if rem(itr,20) == 1
-        prompt = '111 for stop, 0 for continue?? ';
-        stop = input(prompt)
-        if stop == 111
-            break;
-        end
+
+    if itr == 5
+        break;
     end
 end
 
